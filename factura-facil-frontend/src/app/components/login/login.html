@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <!-- Logotipo / Nombre del SaaS -->
+    <h2 class="text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+      Factura Fácil
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      El SaaS para freelancers. Controla tus finanzas.
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow-sm sm:rounded-lg sm:px-10 border border-gray-100">
+      
+      <!-- Alerta de Error en caso de credenciales inválidas -->
+      <div *ngIf="errorMessage" class="mb-4 bg-red-50 border-l-4 border-red-400 p-4 rounded text-sm text-red-700">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Formulario vinculado a nuestro objeto credentials -->
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-6">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Correo electrónico
+          </label>
+          <div class="mt-1">
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              required 
+              [(ngModel)]="credentials.email"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="tu@correo.com"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Contraseña
+          </label>
+          <div class="mt-1">
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              required 
+              [(ngModel)]="credentials.password"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="••••••••"
+            >
+          </div>
+        </div>
+
+        <div>
+          <button 
+            type="submit" 
+            [disabled]="!loginForm.form.valid"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transitions duration-150"
+          >
+            Iniciar sesión
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          ¿No tienes una cuenta? 
+          <a routerLink="/register" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+            Regístrate aquí
+          </a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>

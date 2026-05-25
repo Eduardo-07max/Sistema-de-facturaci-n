@@ -1,0 +1,13 @@
+# Ignorar dependencias
+**/node_modules/
+**/vendor/
+
+# Ignorar archivos de entorno locales
+**/.env
+**/environments/environment.prod.ts
+
+# Ignorar carpetas de compilación e internas
+**/.angular/
+**/dist/
+**/.idea/
+**/.vscode/

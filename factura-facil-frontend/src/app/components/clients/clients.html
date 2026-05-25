@@ -1,0 +1,193 @@
+<div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+  <!-- Encabezado del Módulo Adaptativo con Botón de Retorno -->
+  <div class="border-b border-gray-200 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Gestión de Clientes</h2>
+      <p class="mt-1 text-sm text-gray-500">Administra la información fiscal y de contacto de tus clientes para generar facturas.</p>
+    </div>
+
+    <div>
+      <a 
+        routerLink="/dashboard" 
+        class="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-700 font-medium px-4 py-2.5 border border-gray-200 rounded-xl shadow-sm text-sm transition duration-150 dynamic-touch"
+      >
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Volver al Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    
+    <!-- Columna 1: Formulario (Crear / Editar) -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 lg:col-span-1">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">{{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}</h3>
+      
+      <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        
+        <!-- Campo: Nombre -->
+        <div class="flex flex-col gap-1.5">
+          <label for="name" class="text-sm font-medium text-gray-700">Nombre o Razón Social <span class="text-red-500">*</span></label>
+          <input 
+            id="name" 
+            type="text" 
+            formControlName="name" 
+            placeholder="Ej. Juan Pérez o ACME S.A."
+            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+            [class.border-red-500]="clientForm.get('name')?.touched && clientForm.get('name')?.invalid"
+            [class.focus:ring-red-500]="clientForm.get('name')?.touched && clientForm.get('name')?.invalid"
+            [class.focus:border-red-500]="clientForm.get('name')?.touched && clientForm.get('name')?.invalid"
+          />
+          @if (clientForm.get('name')?.touched && clientForm.get('name')?.errors?.['required']) {
+            <span class="text-xs text-red-500">El nombre es obligatorio.</span>
+          }
+          @if (clientForm.get('name')?.touched && clientForm.get('name')?.errors?.['minlength']) {
+            <span class="text-xs text-red-500">Debe tener al menos 3 caracteres.</span>
+          }
+        </div>
+
+        <!-- Campo: Correo Electrónico -->
+        <div class="flex flex-col gap-1.5">
+          <label for="email" class="text-sm font-medium text-gray-700">Correo Electrónico <span class="text-red-500">*</span></label>
+          <input 
+            id="email" 
+            type="email" 
+            formControlName="email" 
+            placeholder="cliente@correo.com"
+            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+            [class.border-red-500]="clientForm.get('email')?.touched && clientForm.get('email')?.invalid"
+            [class.focus:ring-red-500]="clientForm.get('email')?.touched && clientForm.get('email')?.invalid"
+            [class.focus:border-red-500]="clientForm.get('email')?.touched && clientForm.get('email')?.invalid"
+          />
+          @if (clientForm.get('email')?.touched && clientForm.get('email')?.errors?.['required']) {
+            <span class="text-xs text-red-500">El correo es obligatorio.</span>
+          }
+          @if (clientForm.get('email')?.touched && clientForm.get('email')?.errors?.['email']) {
+            <span class="text-xs text-red-500">Ingresa un formato de correo válido.</span>
+          }
+        </div>
+
+        <!-- Campo: Teléfono -->
+        <div class="flex flex-col gap-1.5">
+          <label for="phone" class="text-sm font-medium text-gray-700">Teléfono (Opcional)</label>
+          <input 
+            id="phone" 
+            type="text" 
+            formControlName="phone" 
+            placeholder="Ej. 5512345678"
+            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+          />
+        </div>
+
+        <!-- Campo: Identificación Fiscal -->
+        <div class="flex flex-col gap-1.5">
+          <label for="tax_id" class="text-sm font-medium text-gray-700">Identificación Fiscal / RFC (Opcional)</label>
+          <input 
+            id="tax_id" 
+            type="text" 
+            formControlName="tax_id" 
+            placeholder="Ej. GAMG940215XYZ"
+            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 uppercase focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+          />
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+          @if (isEditing) {
+            <button 
+              type="button" 
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition duration-150" 
+              (click)="resetForm()"
+            >
+              Cancelar
+            </button>
+          }
+          <button 
+            type="submit" 
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150" 
+            [disabled]="clientForm.invalid"
+          >
+            {{ isEditing ? 'Guardar Cambios' : 'Registrar Cliente' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Columna 2: Tabla de Listado de Clientes -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 lg:col-span-2">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Clientes Registrados</h3>
+
+      <!-- Estado: Cargando Datos -->
+      @if (loading) {
+        <div class="flex flex-col items-center justify-center py-12 space-y-3">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p class="text-sm text-gray-500">Cargando listado de clientes...</p>
+        </div>
+      }
+
+      <!-- Estado: Lista Vacía -->
+      @if (!loading && clients.length === 0) {
+        <div class="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+          <p class="text-sm text-gray-500">No tienes clientes registrados aún. Utiliza el formulario para agregar el primero.</p>
+        </div>
+      }
+
+      <!-- Tabla de Datos -->
+      @if (!loading && clients.length > 0) {
+        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
+            <thead class="bg-gray-50 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <tr>
+                <th class="px-6 py-3">Cliente</th>
+                <th class="px-6 py-3">Contacto</th>
+                <th class="px-6 py-3">ID Fiscal / RFC</th>
+                <th class="px-6 py-3 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white text-gray-900">
+              <tr *ngFor="let client of clients" class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 font-medium text-gray-900">{{ client.name }}</td>
+                <td class="px-6 py-4">
+                  <div class="text-gray-900">{{ client.email }}</div>
+                  @if (client.phone) {
+                    <div class="text-xs text-gray-500 mt-0.5">{{ client.phone }}</div>
+                  }
+                </td>
+                <td class="px-6 py-4">
+                  @if (client.tax_id) {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 uppercase">{{ client.tax_id }}</span>
+                  } @else {
+                    <span class="text-gray-400 italic text-xs">N/A</span>
+                  }
+                </td>
+                <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                  <button 
+                    type="button" 
+                    class="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition duration-150" 
+                    title="Editar cliente"
+                    (click)="editClient(client)"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    type="button" 
+                    class="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-500 hover:bg-red-50 hover:text-red-600 transition duration-150" 
+                    title="Eliminar cliente"
+                    (click)="deleteClient(client.id)"
+                  >
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      }
+
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,247 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Encabezado Principal Adaptativo con Botón de Retorno -->
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Gestión de Facturas</h1>
+      <p class="text-sm text-gray-500 mt-1">Crea cobros para tus clientes y realiza el seguimiento de tus ingresos en tiempo real.</p>
+    </div>
+    
+    <div>
+      <a 
+        routerLink="/dashboard" 
+        class="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-700 font-medium px-4 py-2.5 border border-gray-200 rounded-xl shadow-sm text-sm transition duration-150 dynamic-touch"
+      >
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Volver al Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenedor de dos columnas -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- COLUMNA 1: FORMULARIO DE CREACIÓN (Ocupa 1 columna) -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Nueva Factura
+        </h2>
+
+        <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" class="space-y-5">
+          <!-- Selección de Cliente -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+            <select 
+              formControlName="client_id"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm"
+              [class.border-red-400]="invoiceForm.get('client_id')?.touched && invoiceForm.get('client_id')?.invalid"
+            >
+              <option value="" disabled selected>Selecciona un cliente</option>
+              <option *ngFor="let client of clients" [value]="client.id">
+                {{ client.name }}
+              </option>
+            </select>
+            <p *ngIf="invoiceForm.get('client_id')?.touched && invoiceForm.get('client_id')?.invalid" class="text-xs text-red-500 mt-1">
+              Debes asociar la factura a un cliente.
+            </p>
+          </div>
+
+          <!-- Folio / Número de Factura -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Factura</label>
+            <input 
+              type="text" 
+              formControlName="number"
+              placeholder="Ej: FAC-001"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm"
+              [class.border-red-400]="invoiceForm.get('number')?.touched && invoiceForm.get('number')?.invalid"
+            />
+            <p *ngIf="invoiceForm.get('number')?.touched && invoiceForm.get('number')?.hasError('required')" class="text-xs text-red-500 mt-1">
+              El número de factura es obligatorio.
+            </p>
+            <p *ngIf="invoiceForm.get('number')?.touched && invoiceForm.get('number')?.hasError('pattern')" class="text-xs text-amber-600 mt-1">
+              Usa el formato requerido (Ej: FAC-001).
+            </p>
+          </div>
+
+          <!-- Concepto -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Concepto / Descripción</label>
+            <input 
+              type="text" 
+              formControlName="concept"
+              placeholder="Ej: Desarrollo de Módulo SaaS"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm"
+              [class.border-red-400]="invoiceForm.get('concept')?.touched && invoiceForm.get('concept')?.invalid"
+            />
+            <p *ngIf="invoiceForm.get('concept')?.touched && invoiceForm.get('concept')?.invalid" class="text-xs text-red-500 mt-1">
+              El concepto es obligatorio para detallar el cobro.
+            </p>
+          </div>
+
+          <!-- Fecha de Vencimiento -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Vencimiento</label>
+            <input 
+              type="date" 
+              formControlName="due_date"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm text-gray-700"
+              [class.border-red-400]="invoiceForm.get('due_date')?.touched && invoiceForm.get('due_date')?.invalid"
+            />
+            <p *ngIf="invoiceForm.get('due_date')?.touched && invoiceForm.get('due_date')?.invalid" class="text-xs text-red-500 mt-1">
+              Establece una fecha límite de pago.
+            </p>
+          </div>
+
+          <!-- Monto -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (MXN)</label>
+            <div class="relative rounded-xl shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span class="text-gray-400 text-sm">$</span>
+              </div>
+              <input 
+                type="number" 
+                formControlName="amount"
+                placeholder="0.00"
+                step="0.01"
+                class="w-full pl-7 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition text-sm"
+                [class.border-red-400]="invoiceForm.get('amount')?.touched && invoiceForm.get('amount')?.invalid"
+              />
+            </div>
+            <p *ngIf="invoiceForm.get('amount')?.touched && invoiceForm.get('amount')?.invalid" class="text-xs text-red-500 mt-1">
+              Ingresa un monto válido mayor a 0.
+            </p>
+          </div>
+
+          <!-- Botón de Envío -->
+          <button 
+            type="submit" 
+            [disabled]="invoiceForm.invalid || submitting"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl shadow-sm shadow-indigo-600/10 transition duration-150 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span *ngIf="submitting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            {{ submitting ? 'Generando...' : 'Generar Factura' }}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- COLUMNA 2: TABLA DE HISTORIAL (Ocupa 2 columnas) -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-gray-50 flex items-center justify-between bg-white">
+          <h2 class="text-lg font-semibold text-gray-800">Historial de Cobros</h2>
+          <span class="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
+            {{ invoices.length }} Facturas en total
+          </span>
+        </div>
+
+        <!-- Estado de Carga -->
+        <div *ngIf="loading" class="p-12 flex flex-col items-center justify-center text-gray-400 space-y-3">
+          <div class="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-sm">Consultando registros con el servidor...</p>
+        </div>
+
+        <!-- Tabla vacía -->
+        <div *ngIf="!loading && invoices.length === 0" class="p-12 text-center text-gray-400 space-y-2">
+          <svg class="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p class="text-base font-medium text-gray-600">No hay facturas registradas</p>
+          <p class="text-xs max-w-xs mx-auto">Comienza rellenando el formulario de la izquierda para enviarle un enlace de pago a tus clientes.</p>
+        </div>
+
+        <!-- Vista de la Tabla -->
+        <div *ngIf="!loading && invoices.length > 0" class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-50/70 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-100">
+                <th class="py-3.5 px-6">Folio</th>
+                <th class="py-3.5 px-6">Cliente</th>
+                <th class="py-3.5 px-6">Concepto</th>
+                <th class="py-3.5 px-6">Monto</th>
+                <th class="py-3.5 px-6">Estado</th>
+                <th class="py-3.5 px-6 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50 text-sm text-gray-700">
+              <tr *ngFor="let invoice of invoices" class="hover:bg-gray-50/50 transition duration-150">
+                <!-- Folio -->
+                <td class="py-4 px-6 font-medium text-gray-900">
+                  {{ invoice.number }}
+                </td>
+                <!-- Cliente -->
+                <td class="py-4 px-6 text-gray-600">
+                  {{ invoice.client?.name || getClientName(invoice.client_id) }}
+                </td>
+                <!-- Concepto -->
+                <td class="py-4 px-6 text-gray-500 max-w-[180px] truncate" [title]="invoice.concept">
+                  {{ invoice.concept || 'Sin descripción' }}
+                </td>
+                <!-- Monto -->
+                <td class="py-4 px-6 font-semibold text-gray-800">
+                  {{ invoice.amount | currency:'MXN':'symbol':'1.2-2' }}
+                </td>
+                <!-- Badge de Estado -->
+                <td class="py-4 px-6">
+                  <span [ngClass]="{
+                    'bg-amber-50 text-amber-700 ring-amber-600/10': invoice.status === 'pending',
+                    'bg-emerald-50 text-emerald-700 ring-emerald-600/10': invoice.status === 'paid',
+                    'bg-red-50 text-red-700 ring-red-600/10': invoice.status === 'canceled'
+                  }" class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset capitalize">
+                    {{ invoice.status }}
+                  </span>
+                </td>
+                <!-- Panel de Acciones Rápidas -->
+                <td class="py-4 px-6 text-right space-x-1.5 whitespace-nowrap">
+                  <!-- Descargar PDF -->
+                  <button 
+                    *ngIf="invoice.id"
+                    (click)="downloadPDF(invoice.id)"
+                    title="Descargar PDF de Factura"
+                    class="inline-flex items-center justify-center p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </button>
+
+                  <!-- Copiar Link de Pago -->
+                  <button 
+                    *ngIf="invoice.id && invoice.status === 'pending'"
+                    (click)="copyPaymentLink(invoice.id)"
+                    title="Copiar Link de Pago Stripe"
+                    class="inline-flex items-center justify-center p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </button>
+
+                  <!-- Cancelar / Eliminar Factura -->
+                  <button 
+                    *ngIf="invoice.id && invoice.status !== 'canceled'"
+                    (click)="cancelInvoice(invoice.id)"
+                    title="Cancelar Factura"
+                    class="inline-flex items-center justify-center p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,115 @@
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <h2 class="text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+      Crea tu cuenta
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Únete a Factura Fácil y gestiona tu negocio en minutos.
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow-sm sm:rounded-lg sm:px-10 border border-gray-100">
+      
+      <!-- Alerta de Error -->
+      <div *ngIf="errorMessage" class="mb-4 bg-red-50 border-l-4 border-red-400 p-4 rounded text-sm text-red-700">
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="space-y-6">
+        <!-- Campo: Nombre -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">
+            Nombre completo
+          </label>
+          <div class="mt-1">
+            <input 
+              id="name" 
+              name="name" 
+              type="text" 
+              required 
+              [(ngModel)]="userData.name"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Ej. Juan Pérez"
+            >
+          </div>
+        </div>
+
+        <!-- Campo: Correo -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Correo electrónico
+          </label>
+          <div class="mt-1">
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              required 
+              [(ngModel)]="userData.email"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="tu@correo.com"
+            >
+          </div>
+        </div>
+
+        <!-- Campo: Contraseña -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Contraseña
+          </label>
+          <div class="mt-1">
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              required 
+              minLength="8"
+              [(ngModel)]="userData.password"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Mínimo 8 caracteres"
+            >
+          </div>
+        </div>
+
+        <!-- Campo: Confirmar Contraseña -->
+        <div>
+          <label for="password_confirmation" class="block text-sm font-medium text-gray-700">
+            Confirmar contraseña
+          </label>
+          <div class="mt-1">
+            <input 
+              id="password_confirmation" 
+              name="password_confirmation" 
+              type="password" 
+              required 
+              [(ngModel)]="userData.password_confirmation"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="••••••••"
+            >
+          </div>
+        </div>
+
+        <div>
+          <button 
+            type="submit" 
+            [disabled]="!registerForm.form.valid"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150"
+          >
+            Registrarse
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          ¿Ya tienes una cuenta? 
+          <a routerLink="/login" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+            Inicia sesión aquí
+          </a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
