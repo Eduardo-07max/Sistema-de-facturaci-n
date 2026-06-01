@@ -24,6 +24,7 @@ return [
         env('FRONTEND_URL', 'http://localhost:4200'),
         'http://localhost:4200',
         'http://127.0.0.1:4200',
+        'https://sistema-de-facturaci-n-txg1-n20m2yks8-eduardo-07maxs-projects.vercel.app', // 👈 Añádelo aquí también por seguridad
     ],
 
     'allowed_origins_patterns' => [],
