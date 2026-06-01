@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
 import { Register } from './components/register/register';
 import { Dashboard } from './components/dashboard/dashboard';
-import { Clients } from './components/clients/clients';
-import { Invoices } from './components/invoices/invoices';
+import { Clients } from './clients/clients';
+import { Invoices } from './invoices/invoices';
 import { PasswordChange } from './password-change/password-change';
 import { Profile } from './profile/profile';
 

@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ClientService } from '../../services/client.service';
-import { Client } from '../../Models/client.model';
+import { ClientService } from '../services/client.service'; 
+import { Client } from '../Models/client.model';
 import { RouterLink } from '@angular/router';
 
 @Component({

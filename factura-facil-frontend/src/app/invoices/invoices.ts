@@ -1,10 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { InvoiceService } from '../../services/invoice.service';
-import { ClientService } from '../../services/client.service';
-import { Invoice } from '../../Models/invoice.model';
-import { Client } from '../../Models/client.model';
+import { InvoiceService } from '../services/invoice.service'; 
+import { ClientService } from '../services/client.service'; 
+import { Invoice } from '../Models/invoice.model';
+import { Client } from '../Models/client.model';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
