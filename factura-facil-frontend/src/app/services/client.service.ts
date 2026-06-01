@@ -8,7 +8,7 @@ import { Client } from '../Models/client.model';
 })
 export class ClientService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8000/api/clients'; // Ajusta si tu puerto es distinto
+  private apiUrl = 'https://sistema-de-facturaci-n-production.up.railway.app/api/clients'; // Ajusta si tu puerto es distinto
 
   // Obtener todos los clientes del freelancer
   getClients(): Observable<Client[]> {

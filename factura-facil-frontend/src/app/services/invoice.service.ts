@@ -9,7 +9,7 @@ import { Invoice } from '../Models/invoice.model';
 })
 export class InvoiceService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8000/api/invoices'; // Ajusta tu puerto de Laravel
+  private apiUrl = 'https://sistema-de-facturaci-n-production.up.railway.app/api/invoices'; // Ajusta tu puerto de Laravel
 
   // Obtener todas las facturas del freelancer logueado
   getInvoices(): Observable<Invoice[]> {
@@ -44,6 +44,6 @@ export class InvoiceService {
   // Ruta pública: Generar el link de Stripe Checkout para el cliente final
   // Nota: Apunta a la ruta pública fuera de la protección de login
   createClientPaymentSession(id: number): Observable<{ checkout_url: string }> {
-    return this.http.post<{ checkout_url: string }>(`http://localhost:8000/api/invoices/${id}/pay`, {});
+    return this.http.post<{ checkout_url: string }>(`https://sistema-de-facturaci-n-production.up.railway.app/api/invoices/${id}/pay`, {});
   }
 }

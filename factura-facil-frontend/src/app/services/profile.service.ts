@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class ProfileService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8000/api/profile'; // URL base para el perfil
+  private apiUrl = 'https://sistema-de-facturaci-n-production.up.railway.app/api/profile'; // URL base para el perfil
 
   // 1. Actualizar Datos Básicos (Nombre y Correo)
   updateProfile(data: { name: string; email: string }): Observable<any> {

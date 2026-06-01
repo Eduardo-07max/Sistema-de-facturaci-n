@@ -7,7 +7,7 @@ import { Observable, tap } from 'rxjs';
 })
 export class AuthService {
   // Ponemos la URL base de tu servidor local de Laravel
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = 'https://sistema-de-facturaci-n-production.up.railway.app/api';
 
   constructor(private http: HttpClient) { }
 

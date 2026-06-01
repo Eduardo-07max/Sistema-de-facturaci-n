@@ -60,3 +60,4 @@ Configuración del Frontend
 4 Abre en tu navegador: http://localhost:4200
 
 Desarrollado con enfoque en buenas prácticas de ingeniería de software, separación de responsabilidades y diseño de sistemas modulares.
+
