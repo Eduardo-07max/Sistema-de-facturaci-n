@@ -1,5 +1,4 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ClientService } from '../services/client.service'; 
 import { Client } from '../Models/client.model';
@@ -7,7 +6,7 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-clients',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './clients.html',
   styleUrl: './clients.css',
 })
@@ -20,6 +19,9 @@ export class Clients implements OnInit{
   loading: boolean = true;
   isEditing: boolean = false;
   currentClientId: number | null = null;
+  
+  // Mensaje de error para el banner superior del HTML
+  errorMessage: string | null = null;
 
   ngOnInit(): void {
     this.initForm();
@@ -37,6 +39,8 @@ export class Clients implements OnInit{
 
   loadClients(): void {
     this.loading = true;
+    this.errorMessage = null;
+
     this.clientService.getClients().subscribe({
       next: (data) => {
         this.clients = data;
@@ -45,6 +49,10 @@ export class Clients implements OnInit{
       error: (err) => {
         console.error('Error al cargar clientes', err);
         this.loading = false;
+        
+        if (err.status === 403 && err.error?.message) {
+          this.errorMessage = err.error.message;
+        }
       }
     });
   }
@@ -52,6 +60,7 @@ export class Clients implements OnInit{
   onSubmit(): void {
     if (this.clientForm.invalid) return;
 
+    this.errorMessage = null;
     const clientData: Client = this.clientForm.value;
 
     if (this.isEditing && this.currentClientId) {
@@ -61,7 +70,14 @@ export class Clients implements OnInit{
           this.loadClients();
           this.resetForm();
         },
-        error: (err) => console.error('Error al actualizar cliente', err)
+        error: (err) => {
+          console.error('Error al actualizar cliente', err);
+          if (err.status === 403 && err.error?.message) {
+            this.errorMessage = err.error.message;
+            // 🔥 Alerta nativa inmediata al intentar editar sin suscripción
+            alert(`Acceso Denegado: ${err.error.message}`);
+          }
+        }
       });
     } else {
       // Crear nuevo cliente
@@ -70,7 +86,14 @@ export class Clients implements OnInit{
           this.loadClients();
           this.resetForm();
         },
-        error: (err) => console.error('Error al crear cliente', err)
+        error: (err) => {
+          console.error('Error al crear cliente', err);
+          if (err.status === 403 && err.error?.message) {
+            this.errorMessage = err.error.message;
+            // 🔥 Alerta nativa inmediata al intentar registrar sin suscripción
+            alert(`Acceso Denegado: ${err.error.message}`);
+          }
+        }
       });
     }
   }
@@ -88,10 +111,19 @@ export class Clients implements OnInit{
 
   deleteClient(id: number | undefined): void {
     if (!id) return;
+    this.errorMessage = null;
+
     if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
       this.clientService.deleteClient(id).subscribe({
         next: () => this.loadClients(),
-        error: (err) => console.error('Error al eliminar cliente', err)
+        error: (err) => {
+          console.error('Error al eliminar cliente', err);
+          if (err.status === 403 && err.error?.message) {
+            this.errorMessage = err.error.message;
+            // 🔥 Alerta nativa inmediata al intentar borrar sin suscripción
+            alert(`Acceso Denegado: ${err.error.message}`);
+          }
+        }
       });
     }
   }
@@ -100,5 +132,6 @@ export class Clients implements OnInit{
     this.clientForm.reset();
     this.isEditing = false;
     this.currentClientId = null;
+    this.errorMessage = null;
   }
 }

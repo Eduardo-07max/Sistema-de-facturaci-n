@@ -1,15 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { InvoiceService } from '../services/invoice.service'; 
 import { ClientService } from '../services/client.service'; 
 import { Invoice } from '../Models/invoice.model';
 import { Client } from '../Models/client.model';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { NgClass, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-invoices',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NgClass, CurrencyPipe], // Usamos Control Flow moderno de Angular 21, no requiere CommonModule
   templateUrl: './invoices.html',
   styleUrl: './invoices.css',
 })
@@ -24,6 +24,9 @@ export class Invoices implements OnInit {
   
   loading: boolean = true;
   submitting: boolean = false;
+  
+  // Variable global para capturar errores de suscripción o acceso restringido (403)
+  errorMessage: string | null = null;
 
   ngOnInit(): void {
     this.initForm();
@@ -35,13 +38,14 @@ export class Invoices implements OnInit {
       client_id: ['', [Validators.required]],
       number: ['', [Validators.required, Validators.pattern(/^FAC-\d+$/)]],
       amount: ['', [Validators.required, Validators.min(1)]],
-      concept: ['', [Validators.required, Validators.maxLength(255)]], // <-- Nuevo campo
-      due_date: ['', [Validators.required]] // <-- Nuevo campo
+      concept: ['', [Validators.required, Validators.maxLength(255)]],
+      due_date: ['', [Validators.required]]
     });
   }
 
   private loadInitialData(): void {
     this.loading = true;
+    this.errorMessage = null;
     
     this.clientService.getClients().subscribe({
       next: (clientsData) => {
@@ -51,6 +55,9 @@ export class Invoices implements OnInit {
       error: (err) => {
         console.error('Error al cargar clientes', err);
         this.loading = false;
+        if (err.status === 403 && err.error?.message) {
+          this.errorMessage = err.error.message;
+        }
       }
     });
   }
@@ -64,6 +71,9 @@ export class Invoices implements OnInit {
       error: (err) => {
         console.error('Error al cargar facturas', err);
         this.loading = false;
+        if (err.status === 403 && err.error?.message) {
+          this.errorMessage = err.error.message;
+        }
       }
     });
   }
@@ -72,12 +82,12 @@ export class Invoices implements OnInit {
     if (this.invoiceForm.invalid) return;
 
     this.submitting = true;
+    this.errorMessage = null;
     const newInvoice: Invoice = this.invoiceForm.value;
 
     this.invoiceService.createInvoice(newInvoice).subscribe({
       next: (createdInvoice) => {
         console.log('Factura creada con éxito', createdInvoice);
-        // Reseteamos incluyendo los nuevos campos vacíos
         this.invoiceForm.reset({ 
           client_id: '', 
           number: '', 
@@ -91,6 +101,9 @@ export class Invoices implements OnInit {
       error: (err) => {
         console.error('Error al crear la factura', err);
         this.submitting = false;
+        if (err.status === 403 && err.error?.message) {
+          this.errorMessage = err.error.message;
+        }
       }
     });
   }
@@ -106,7 +119,12 @@ export class Invoices implements OnInit {
         a.click();
         document.body.removeChild(a);
       },
-      error: (err) => console.error('Error al descargar el PDF', err)
+      error: (err) => {
+        console.error('Error al descargar el PDF', err);
+        if (err.status === 403 && err.error?.message) {
+          this.errorMessage = err.error.message;
+        }
+      }
     });
   }
 
@@ -118,17 +136,28 @@ export class Invoices implements OnInit {
           alert('¡Enlace de pago copiado al portapapeles!');
         }
       },
-      error: (err) => console.error('Error al generar enlace de pago', err)
+      error: (err) => {
+        console.error('Error al generar enlace de pago', err);
+        if (err.status === 403 && err.error?.message) {
+          this.errorMessage = err.error.message;
+        }
+      }
     });
   }
 
   cancelInvoice(id: number): void {
     if (confirm('¿Estás seguro de que deseas cancelar esta factura?')) {
+      this.errorMessage = null;
       this.invoiceService.deleteInvoice(id).subscribe({
         next: () => {
           this.loadInvoices();
         },
-        error: (err) => console.error('Error al cancelar factura', err)
+        error: (err) => {
+          console.error('Error al cancelar factura', err);
+          if (err.status === 403 && err.error?.message) {
+            this.errorMessage = err.error.message;
+          }
+        }
       });
     }
   }
