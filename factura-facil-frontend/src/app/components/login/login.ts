@@ -11,7 +11,6 @@ import { AuthService } from '../../services/auth';
   styleUrl: './login.css',
 })
 export class Login {
-// 🔥 Inyectamos los servicios de forma moderna sin constructor
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -22,17 +21,25 @@ export class Login {
 
   errorMessage: string = '';
 
-
   onLogin(): void {
     this.errorMessage = '';
     
     this.authService.login(this.credentials).subscribe({
-      next: (response) => {
-        // Si todo sale bien, mandamos al freelancer al dashboard
+      next: (response: any) => {
+        // 🔥 GUARDAMOS EL TOKEN: El guard lo necesita para dejarte pasar
+        // Si tu API de Laravel devuelve el token con otro nombre (ej. response.access_token), cámbialo aquí abajo:
+        const token = response.token || response.access_token;
+        
+        if (token) {
+          localStorage.setItem('token', token);
+          // Si tu API también devuelve datos del usuario, puedes guardarlos si quieres:
+          // localStorage.setItem('user', JSON.stringify(response.user));
+        }
+
+        // Ahora sí, el Guard verá el token y nos dejará pasar al dashboard
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        // Si las credenciales no coinciden o hay un error
         this.errorMessage = 'Credenciales incorrectas. Por favor, intenta de nuevo.';
         console.error(err);
       }

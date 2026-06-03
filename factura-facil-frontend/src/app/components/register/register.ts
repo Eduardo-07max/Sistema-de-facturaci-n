@@ -11,10 +11,9 @@ import { AuthService } from '../../services/auth';
   styleUrl: './register.css',
 })
 export class Register {
-private authService = inject(AuthService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Objeto con los campos idénticos a los que espera Laravel para el registro
   userData = {
     name: '',
     email: '',
@@ -27,19 +26,23 @@ private authService = inject(AuthService);
   onRegister(): void {
     this.errorMessage = '';
 
-    // Validación básica antes de enviar los datos
     if (this.userData.password !== this.userData.password_confirmation) {
       this.errorMessage = 'Las contraseñas no coinciden.';
       return;
     }
 
     this.authService.register(this.userData).subscribe({
-      next: (response) => {
-        // Registro exitoso, redirigimos al Dashboard
+      next: (response: any) => {
+        // 🔥 GUARDAMOS EL TOKEN TAMBIÉN AQUÍ SI LARAVEL LO INCLUYE AL REGISTRAR
+        const token = response.token || response.access_token;
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+
+        // Redirigimos al Dashboard con el token listo
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        // Manejo de errores por si el correo ya está registrado u otra validación de Laravel falla
         this.errorMessage = err.error?.message || 'Hubo un error al registrar la cuenta. Intenta de nuevo.';
         console.error(err);
       }
